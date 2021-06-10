@@ -6,6 +6,6 @@ namespace PDR.PatientBooking.Service.BookingServices
     public interface IBookingService
     {
         public void AddBooking(AddBookingRequest request);
-        public GetPatientNextAppointmentRequest GetPatientNextAppointment(long identificationNumber);
+        public GetPatientNextAppointmentResponse GetPatientNextAppointment(long identificationNumber);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace PDR.PatientBooking.Service.BookingServices.Responses
 {
-    public class GetPatientNextAppointmentRequest
+    public class GetPatientNextAppointmentResponse
     {
         public Guid Id { get; set; }
         public long DoctorId { get; set; }
