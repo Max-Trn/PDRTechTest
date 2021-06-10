@@ -5,6 +5,7 @@ using Moq;
 using NUnit.Framework;
 using PDR.PatientBooking.Data;
 using PDR.PatientBooking.Data.Models;
+using PDR.PatientBooking.Service.DateTimeProvider;
 using PDR.PatientBooking.Service.DoctorServices;
 using PDR.PatientBooking.Service.DoctorServices.Requests;
 using PDR.PatientBooking.Service.DoctorServices.Responses;
@@ -25,6 +26,7 @@ namespace PDR.PatientBooking.Service.Tests.DoctorServices
 
         private PatientBookingContext _context;
         private Mock<IAddDoctorRequestValidator> _validator;
+        private Mock<IDateTimeProvider> _dateTimeProvider;
 
         private DoctorService _doctorService;
 
@@ -41,14 +43,15 @@ namespace PDR.PatientBooking.Service.Tests.DoctorServices
             // Mock setup
             _context = new PatientBookingContext(new DbContextOptionsBuilder<PatientBookingContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             _validator = _mockRepository.Create<IAddDoctorRequestValidator>();
-
+            _dateTimeProvider = _mockRepository.Create<IDateTimeProvider>();
             // Mock default
             SetupMockDefaults();
 
             // Sut instantiation
             _doctorService = new DoctorService(
                 _context,
-                _validator.Object
+                _validator.Object,
+                _dateTimeProvider.Object
             );
         }
 
@@ -56,6 +59,7 @@ namespace PDR.PatientBooking.Service.Tests.DoctorServices
         {
             _validator.Setup(x => x.ValidateRequest(It.IsAny<AddDoctorRequest>()))
                 .Returns(new PdrValidationResult(true));
+            _dateTimeProvider.Setup(x => x.DateTimeNow).Returns(DateTime.UtcNow);
         }
 
         [Test]
@@ -100,7 +104,7 @@ namespace PDR.PatientBooking.Service.Tests.DoctorServices
                 Email = request.Email,
                 DateOfBirth = request.DateOfBirth,
                 Orders = new List<Order>(),
-                Created = DateTime.UtcNow
+                Created = _dateTimeProvider.Object.DateTimeNow
             };
 
             //act
