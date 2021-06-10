@@ -9,6 +9,7 @@ using Moq;
 using NUnit.Framework;
 using PDR.PatientBooking.Data;
 using PDR.PatientBooking.Data.Models;
+using PDR.PatientBooking.Service.DateTimeProvider;
 using PDR.PatientBooking.Service.Enums;
 using PDR.PatientBooking.Service.PatientServices;
 using PDR.PatientBooking.Service.PatientServices.Requests;
@@ -26,6 +27,7 @@ namespace PDR.PatientBooking.Service.Tests.PatientServices
 
         private PatientBookingContext _context;
         private Mock<IAddPatientRequestValidator> _validator;
+        private Mock<IDateTimeProvider> _dateTimeProvider;
 
         private PatientService _patientService;
 
@@ -42,6 +44,7 @@ namespace PDR.PatientBooking.Service.Tests.PatientServices
             // Mock setup
             _context = new PatientBookingContext(new DbContextOptionsBuilder<PatientBookingContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             _validator = _mockRepository.Create<IAddPatientRequestValidator>();
+            _dateTimeProvider = _mockRepository.Create<IDateTimeProvider>();
 
             // Mock default
             SetupMockDefaults();
@@ -49,7 +52,8 @@ namespace PDR.PatientBooking.Service.Tests.PatientServices
             // Sut instantiation
             _patientService = new PatientService(
                 _context,
-                _validator.Object
+                _validator.Object,
+                _dateTimeProvider.Object
             );
         }
 
@@ -57,6 +61,7 @@ namespace PDR.PatientBooking.Service.Tests.PatientServices
         {
             _validator.Setup(x => x.ValidateRequest(It.IsAny<AddPatientRequest>()))
                 .Returns(new PdrValidationResult(true));
+            _dateTimeProvider.Setup(x => x.DateTimeNow).Returns(DateTime.UtcNow);
         }
 
         [Test]
@@ -102,7 +107,7 @@ namespace PDR.PatientBooking.Service.Tests.PatientServices
                 DateOfBirth = request.DateOfBirth,
                 Orders = new List<Order>(),
                 ClinicId = request.ClinicId,
-                Created = DateTime.UtcNow
+                Created = _dateTimeProvider.Object.DateTimeNow
             };
 
             //act

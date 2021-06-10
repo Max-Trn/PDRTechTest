@@ -6,6 +6,7 @@ using PDR.PatientBooking.Data;
 using PDR.PatientBooking.Data.Models;
 using PDR.PatientBooking.Service.DoctorServices.Requests;
 using PDR.PatientBooking.Service.DoctorServices.Validation;
+using PDR.PatientBooking.Service.Validation;
 using System;
 
 namespace PDR.PatientBooking.Service.Tests.DoctorServices.Validation
@@ -16,6 +17,7 @@ namespace PDR.PatientBooking.Service.Tests.DoctorServices.Validation
         private IFixture _fixture;
 
         private PatientBookingContext _context;
+        private IEmailValidator _emailValidator;
 
         private AddDoctorRequestValidator _addDoctorRequestValidator;
 
@@ -30,13 +32,15 @@ namespace PDR.PatientBooking.Service.Tests.DoctorServices.Validation
 
             // Mock setup
             _context = new PatientBookingContext(new DbContextOptionsBuilder<PatientBookingContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
-
+            _emailValidator = new RegexEmailValidator();
+            
             // Mock default
             SetupMockDefaults();
 
             // Sut instantiation
             _addDoctorRequestValidator = new AddDoctorRequestValidator(
-                _context
+                _context,
+                _emailValidator
             );
         }
 
@@ -109,8 +113,6 @@ namespace PDR.PatientBooking.Service.Tests.DoctorServices.Validation
         [TestCase("user@")]
         [TestCase("@")]
         [TestCase("user")]
-        [TestCase(null)]
-        [TestCase("")]
         public void ValidateRequest_InvalidEmail_ReturnsFailedValidationResult(string email)
         {
             //arrange
