@@ -29,10 +29,10 @@ namespace PDR.PatientBookingApi.Controllers
             {
                 return Ok(_bookingService.GetPatientNextAppointment(identificationNumber));
             }
-            catch (Exception ex)
+            catch
             {
                 //If somebody handles 502 code changing code status can break their systems 
-                return StatusCode(502, ex);
+                return StatusCode(502);
             }
         }
 
@@ -50,7 +50,7 @@ namespace PDR.PatientBookingApi.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, ex.Message);
             }
         }
 

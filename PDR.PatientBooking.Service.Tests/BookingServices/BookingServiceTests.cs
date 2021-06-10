@@ -7,7 +7,9 @@ using PDR.PatientBooking.Data;
 using PDR.PatientBooking.Data.Models;
 using PDR.PatientBooking.Service.BookingServices;
 using PDR.PatientBooking.Service.BookingServices.Requests;
+using PDR.PatientBooking.Service.BookingServices.Validation;
 using PDR.PatientBooking.Service.DateTimeProvider;
+using PDR.PatientBooking.Service.Validation;
 using System;
 
 namespace PDR.PatientBooking.Service.Tests.BookingServices
@@ -20,6 +22,7 @@ namespace PDR.PatientBooking.Service.Tests.BookingServices
 
         private PatientBookingContext _context;
         private Mock<IDateTimeProvider> _dateTimeProvider;
+        private Mock<IAddBookingRequestValidator> _validator;
 
         private BookingService _bookingService;
 
@@ -36,18 +39,23 @@ namespace PDR.PatientBooking.Service.Tests.BookingServices
             // Mock setup
             _context = new PatientBookingContext(new DbContextOptionsBuilder<PatientBookingContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             _dateTimeProvider = _mockRepository.Create<IDateTimeProvider>();
+            _validator = _mockRepository.Create<IAddBookingRequestValidator>();
 
             // Mock default
             SetupMockDefaults();
 
             // Sut instantiation
             _bookingService = new BookingService(
-                _context
+                _context,
+                _validator.Object
             );
         }
 
         private void SetupMockDefaults()
         {
+            _validator.Setup(x => x.ValidateRequest(It.IsAny<AddBookingRequest>()))
+                .Returns(new PdrValidationResult(true));
+            _dateTimeProvider.Setup(x => x.DateTimeNow).Returns(DateTime.UtcNow);
         }
 
         [Test]

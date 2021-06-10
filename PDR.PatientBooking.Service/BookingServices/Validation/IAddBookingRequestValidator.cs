@@ -3,7 +3,7 @@ using PDR.PatientBooking.Service.Validation;
 
 namespace PDR.PatientBooking.Service.BookingServices.Validation
 {
-    public interface IAddBookingRequestValidation
+    public interface IAddBookingRequestValidator
     {
         PdrValidationResult ValidateRequest(AddBookingRequest request);
     }
