@@ -6,6 +6,7 @@ using PDR.PatientBooking.Service.DoctorServices;
 using PDR.PatientBooking.Service.DoctorServices.Validation;
 using PDR.PatientBooking.Service.PatientServices;
 using PDR.PatientBooking.Service.PatientServices.Validation;
+using PDR.PatientBooking.Service.Validation;
 
 namespace PDR.PatientBooking.Service.IoC
 {
@@ -23,6 +24,7 @@ namespace PDR.PatientBooking.Service.IoC
             collection.AddScoped<IAddClinicRequestValidator, AddClinicRequestValidator>();
 
             collection.AddScoped<IDateTimeProvider, UtcDateTimeProvider>();
+            collection.AddScoped<IEmailValidator, RegexEmailValidator>();
         }
     }
 }
