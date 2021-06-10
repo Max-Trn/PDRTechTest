@@ -54,14 +54,14 @@ namespace PDR.PatientBooking.Data.DataSeed
                 new Order
                 {
                     Id = Guid.Parse("b67c2730-0c12-4236-9b1a-d5b1d22db247"),
-                    StartTime = new DateTime(2021, 1, 11, 12, 15, 00),
-                    EndTime = new DateTime(2021, 1, 11, 12, 30, 00)
+                    StartTime = new DateTime(2021, 9, 11, 12, 15, 00),
+                    EndTime = new DateTime(2021, 9, 11, 12, 30, 00)
                 },
                 new Order
                 {
                     Id = Guid.Parse("31924ff1-c64e-4e1e-977e-704abc062aa4"),
-                    StartTime = new DateTime(2021, 1, 12, 12, 15, 00),
-                    EndTime = new DateTime(2021, 1, 12, 12, 30, 00)
+                    StartTime = new DateTime(2021, 10, 12, 12, 15, 00),
+                    EndTime = new DateTime(2021, 10, 12, 12, 30, 00)
                 }
             };
 
