@@ -27,6 +27,7 @@ namespace PDR.PatientBooking.Service.IoC
 
             collection.AddScoped<IBookingService, BookingService>();
             collection.AddScoped<IAddBookingRequestValidator, AddBookingRequestValidator>();
+            collection.AddScoped<ICancelBookingRequestValidator, CancelBookingRequestValidator>();
 
             collection.AddScoped<IDateTimeProvider, UtcDateTimeProvider>();
             collection.AddScoped<IEmailValidator, RegexEmailValidator>();

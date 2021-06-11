@@ -9,6 +9,7 @@ using PDR.PatientBooking.Service.BookingServices;
 using PDR.PatientBooking.Service.BookingServices.Requests;
 using PDR.PatientBooking.Service.BookingServices.Validation;
 using PDR.PatientBooking.Service.DateTimeProvider;
+using PDR.PatientBooking.Service.Enums;
 using PDR.PatientBooking.Service.Validation;
 using System;
 
@@ -22,7 +23,8 @@ namespace PDR.PatientBooking.Service.Tests.BookingServices
 
         private PatientBookingContext _context;
         private Mock<IDateTimeProvider> _dateTimeProvider;
-        private Mock<IAddBookingRequestValidator> _validator;
+        private Mock<IAddBookingRequestValidator> _addBookingValidator;
+        private Mock<ICancelBookingRequestValidator> _cancelBookingValidator;
 
         private BookingService _bookingService;
 
@@ -39,7 +41,8 @@ namespace PDR.PatientBooking.Service.Tests.BookingServices
             // Mock setup
             _context = new PatientBookingContext(new DbContextOptionsBuilder<PatientBookingContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             _dateTimeProvider = _mockRepository.Create<IDateTimeProvider>();
-            _validator = _mockRepository.Create<IAddBookingRequestValidator>();
+            _addBookingValidator = _mockRepository.Create<IAddBookingRequestValidator>();
+            _cancelBookingValidator = _mockRepository.Create<ICancelBookingRequestValidator>();
 
             // Mock default
             SetupMockDefaults();
@@ -47,14 +50,18 @@ namespace PDR.PatientBooking.Service.Tests.BookingServices
             // Sut instantiation
             _bookingService = new BookingService(
                 _context,
-                _validator.Object
+                _addBookingValidator.Object,
+                _cancelBookingValidator.Object
             );
         }
 
         private void SetupMockDefaults()
         {
-            _validator.Setup(x => x.ValidateRequest(It.IsAny<AddBookingRequest>()))
+            _addBookingValidator.Setup(x => x.ValidateRequest(It.IsAny<AddBookingRequest>()))
                 .Returns(new PdrValidationResult(true));
+            _cancelBookingValidator.Setup(x => x.ValidateRequest(It.IsAny<Order>()))
+                .Returns(new PdrValidationResult(true));
+
             _dateTimeProvider.Setup(x => x.DateTimeNow).Returns(DateTime.UtcNow);
         }
 
@@ -89,6 +96,22 @@ namespace PDR.PatientBooking.Service.Tests.BookingServices
 
             //assert
             _context.Order.Should().ContainEquivalentOf(expected, options => options.Excluding(order => order.Id));
+        }
+
+        [Test]
+        public void CancelBooking_ActiveBooking_ShoudChangeStatusToCanceled()
+        {
+            //arrange
+            var order = _fixture.Build<Order>().With(x=>x.State, (int)BookingState.Active).Create();
+            _context.Order.Add(order);
+            _context.SaveChanges();
+
+            //act
+            _bookingService.CancelBooking(order.Id);
+
+            //assert
+            order.State = (int)BookingState.Canceled;
+            _context.Order.Should().ContainEquivalentOf(order);
         }
     }
 }
