@@ -77,5 +77,23 @@ namespace PDR.PatientBookingApi.Controllers
             public long DoctorId { get; set; }
             public int SurgeryType { get; set; }
         }
+
+        [HttpPost("{identificationNumber}")]
+        public IActionResult CancelBooking(Guid identificationNumber)
+        {
+            try
+            {
+                _bookingService.CancelBooking(identificationNumber);
+                return Ok();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }
